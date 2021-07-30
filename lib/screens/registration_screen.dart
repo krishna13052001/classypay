@@ -2,6 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+import 'widgets/otp_verify_popup.dart';
 
 class RegistrationScreen extends StatefulWidget {
   static const routeName = './registration';
