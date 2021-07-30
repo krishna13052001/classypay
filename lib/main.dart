@@ -10,12 +10,21 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Flutter Demo',
+      title: 'Classypay',
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
         primarySwatch: Colors.blue,
       ),
       home: HomeScreen(),
+      theme: ThemeData(
+        primaryColor: Colors.red,
+        accentColor: Colors.oranged,
+      ),
+      routes:{
+        LogInScreen.routeName: (ctx) => LogInScreen(),
+        RegistrationScreen.routeName: (ctx) => RegistrationScreen(),
+
+      }
     );
   }
 }
