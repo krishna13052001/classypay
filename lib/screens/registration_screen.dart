@@ -13,9 +13,6 @@ class RegistrationScreenState extends State<RegistrationScreen> {
   Size _size;
   String _radioVal = '';
   final _nameCtrl = TextEditingController();
-  final _optnCtrl = TextEditingController();
-  final _ageCtrl = TextEditingController();
-  final _addCtrl = TextEditingController();
   final _phNoCtrl = TextEditingController();
   final _formkey = GlobalKey<FormState>();
 
@@ -33,12 +30,7 @@ class RegistrationScreenState extends State<RegistrationScreen> {
       final _user = AppUser(
         id: DateTime.now().toString(),
         name: _nameCtrl.text,
-        occupation: _optnCtrl.text,
-        age: _ageCtrl.text,
-        address: _addCtrl.text,
         phoneNumber: '+91 ' + _phNoCtrl.text,
-        timeCreated: DateTime.now(),
-        isServiceProvider: _radioVal == 'Service provider' ? true : false,
       );
       Fluttertoast.showToast(msg: 'Please wait...');
       LoadingDialog.loader(context);
@@ -81,7 +73,11 @@ class RegistrationScreenState extends State<RegistrationScreen> {
         body: Container(
             decoration: BoxDecoration(
                 gradient: LinearGradient(
-                    colors: [Colors.yellow, Colors.amber, Colors.orange])),
+                    colors:  colors: <Color>[
+                        Color(0xffee0000),
+                        Color(0xffeeee00)
+                    ],
+                    )),
             child: ListView(
                 physics: BouncingScrollPhysics(),
                 padding: EdgeInsets.symmetric(vertical: _size.height * 0.05),
@@ -135,49 +131,6 @@ class RegistrationScreenState extends State<RegistrationScreen> {
                               ),
                               keyboardType: TextInputType.text,
                             ),
-                            Row(children: [
-                              SizedBox(
-                                  width: _size.width * 0.6,
-                                  child: TextFormField(
-                                    controller: _optnCtrl,
-                                    validator: (value) {
-                                      if (value.isEmpty)
-                                        return 'This must be filled!';
-                                      return null;
-                                    },
-                                    decoration: InputDecoration(
-                                      labelText: "Occupation",
-                                    ),
-                                    keyboardType: TextInputType.text,
-                                  )),
-                              SizedBox(width: _size.width * 0.1),
-                              SizedBox(
-                                  width: _size.width * 0.2,
-                                  child: TextFormField(
-                                    controller: _ageCtrl,
-                                    validator: (value) {
-                                      if (value.isEmpty)
-                                        return 'This must be filled!';
-                                      return null;
-                                    },
-                                    decoration: InputDecoration(
-                                      labelText: "Age",
-                                    ),
-                                    keyboardType: TextInputType.number,
-                                  ))
-                            ]),
-                            TextFormField(
-                              controller: _addCtrl,
-                              validator: (value) {
-                                if (value.isEmpty)
-                                  return 'This must be filled!';
-                                return null;
-                              },
-                              decoration: InputDecoration(
-                                labelText: "Address",
-                              ),
-                              keyboardType: TextInputType.text,
-                            ),
                             TextFormField(
                               controller: _phNoCtrl,
                               validator: (value) {
@@ -198,24 +151,6 @@ class RegistrationScreenState extends State<RegistrationScreen> {
                                         fontSize: 18,
                                         fontWeight: FontWeight.w600,
                                         color: Colors.blueGrey))),
-                            Column(children: [
-                              RadioListTile(
-                                dense: true,
-                                title: Text('Service provider',
-                                    style: TextStyle(fontSize: 14)),
-                                groupValue: _radioVal,
-                                onChanged: _onRadioPress,
-                                value: 'Service provider',
-                              ),
-                              RadioListTile(
-                                dense: true,
-                                title: Text('User',
-                                    style: TextStyle(fontSize: 14)),
-                                groupValue: _radioVal,
-                                onChanged: _onRadioPress,
-                                value: 'User',
-                              )
-                            ]),
                             Align(
                                 alignment: Alignment.centerRight,
                                 child: Padding(
