@@ -12,44 +12,58 @@ class ContactList extends StatefulWidget {
 
 class _ContactListState extends State<ContactList> {
   List<Contact> _contactList = [];
+  bool _status = false;
 
-  Future<void> _getContacts() async {
+  Future<void> _getContactPermission() async {
     var status = await Permission.contacts.request();
-    if (status.isGranted) {
+    if (status.isGranted)
+      setState(() {
+        _status = true;
+      });
+  }
+
+  Future<List<Contact>> _getContacts() async {
+    await _getContactPermission();
+    if (_status) {
       _contactList = (await ContactsService.getContacts()).toList();
-      setState(() {});
-    }
+      return _contactList;
+    } else
+      return _contactList;
   }
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-        child: FutureBuilder(
+    return FutureBuilder(
       future: _getContacts(),
       builder: (context, snapshot) {
-        if (snapshot.connectionState == ConnectionState.waiting)
-          return CircularProgressIndicator();
-        else if (snapshot.hasError)
-          return Container(child: Center(child: Text('Something went wrong!')));
+        if (snapshot.connectionState == ConnectionState.waiting && !_status)
+          return Center(child: CircularProgressIndicator());
         else
-          return ListView.builder(
-              itemCount: _contactList.length,
-              itemBuilder: (context, index) => ListTile(
-                    key: ValueKey(index),
-                    leading: CircleAvatar(
-                        backgroundColor: Colors.black,
-                        child: Text(_contactList[index].initials())),
-                    title: Text(_contactList[index].displayName ?? '#'),
-                    subtitle: Text(_contactList[index]
-                            .phones
-                            ?.toList()[0]
-                            .value
-                            .toString() ??
-                        ""),
-                    trailing: IconButton(
-                        onPressed: () {}, icon: Icon(Icons.send_outlined)),
-                  ));
+          return _contactList.length == 0
+              ? Center(
+                  child: _status
+                      ? Text('No contacts to show.')
+                      : Text(
+                          'Please provide access to your contacts to show here.'))
+              : ListView.builder(
+                  physics: BouncingScrollPhysics(),
+                  itemCount: _contactList.length,
+                  itemBuilder: (context, index) => ListTile(
+                        key: ValueKey(index),
+                        leading: CircleAvatar(
+                            backgroundColor: Colors.black,
+                            child: Text(_contactList[index].initials())),
+                        title: Text(_contactList[index].displayName ?? '#'),
+                        subtitle: Text(_contactList[index]
+                                .phones
+                                ?.toList()[0]
+                                .value
+                                .toString() ??
+                            ""),
+                        trailing: IconButton(
+                            onPressed: () {}, icon: Icon(Icons.send_outlined)),
+                      ));
       },
-    ));
+    );
   }
 }
