@@ -1,6 +1,9 @@
 import "package:flutter/material.dart";
 import 'package:flutter/services.dart';
 
+import '../screens/registration_screen.dart';
+import '../helpers/snackbar.dart';
+
 class LogInScreen extends StatefulWidget {
   static const routeName = './login';
 
@@ -11,17 +14,17 @@ class LogInScreen extends StatefulWidget {
 class LogInScreenState extends State<LogInScreen> {
   final _formKey = GlobalKey<FormState>();
   final _phNoCtrl = TextEditingController();
-  Size _size;
+  late Size _size;
 
   void onSigninPress() {
-    if (_formKey.currentState.validate()) {
-      _formKey.currentState.save();
-      Authentication.signupWithPhoneNumber(context,
-          isLogin: true, phoneNumber: '+91 ' + _phNoCtrl.text);
-      Navigator.of(context).push(PageRouteBuilder(
-        pageBuilder: (context, _, __) => OtpVerifyPopup(isLogin: true),
-        opaque: false,
-      ));
+    if (_formKey.currentState!.validate()) {
+      _formKey.currentState!.save();
+      showSnackBar(context, message: 'Please wait...');
+      // Navigator.of(context).push(PageRouteBuilder(
+      //   pageBuilder: (context, _, __) => OtpVerifyPopup(isLogin: true),
+      //   opaque: false,
+      // ));
+      showSnackBar(context, message: "Login successful...");
     }
   }
 
@@ -32,21 +35,19 @@ class LogInScreenState extends State<LogInScreen> {
         body: Container(
             decoration: BoxDecoration(
                 gradient: LinearGradient(
-                    colors: <Color>[
-                        Color(0xffee0000),
-                        Color(0xffeeee00)
-                    ],
-                )
-            ),
+              colors: <Color>[Color(0xffee0000), Color(0xffeeee00)],
+            )),
             child: ListView(
                 physics: BouncingScrollPhysics(),
                 padding: EdgeInsets.symmetric(vertical: _size.height * 0.05),
                 children: [
-                  Align(
-                      alignment: Alignment.centerLeft,
-                      child: IconButton(
-                          icon: Icon(Icons.arrow_back),
-                          onPressed: () => Navigator.pop(context))),
+                  Navigator.canPop(context)
+                      ? Align(
+                          alignment: Alignment.centerLeft,
+                          child: IconButton(
+                              icon: Icon(Icons.arrow_back),
+                              onPressed: () => Navigator.pop(context)))
+                      : SizedBox(height: 30),
                   Padding(
                       padding: EdgeInsets.only(left: _size.width * 0.05),
                       child: RichText(
@@ -66,16 +67,11 @@ class LogInScreenState extends State<LogInScreen> {
                                 TextSpan(
                                     text: 'Please login to continue!',
                                     style: TextStyle(fontSize: 14)),
-                                    color: Color.green
                               ],
                               style: TextStyle(
                                   color: Colors.black,
                                   fontSize: 20,
-                                  fontWeight: FontWeight.bold
-                                )
-                        )
-                    )
-                ),
+                                  fontWeight: FontWeight.bold)))),
                   SizedBox(height: _size.height * 0.1),
                   Padding(
                       padding:
@@ -88,13 +84,15 @@ class LogInScreenState extends State<LogInScreen> {
                                 TextFormField(
                                   controller: _phNoCtrl,
                                   validator: (value) {
-                                    if (value.isEmpty)
+                                    if (value!.isEmpty)
                                       return 'This must be filled!';
+                                    else if (value.length != 10)
+                                      return 'Phone number must contain 10 digits!';
                                     return null;
                                   },
                                   decoration: InputDecoration(
-                                    labelText: "Phone Number",
-                                  ),
+                                      labelText: "Phone Number",
+                                      prefixText: "+91 "),
                                   keyboardType: TextInputType.phone,
                                 ),
                                 Align(
@@ -118,8 +116,7 @@ class LogInScreenState extends State<LogInScreen> {
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       Text('New Candidate?'),
-                      FlatButton(
-                        textColor: Theme.of(context).accentColor,
+                      TextButton(
                         child: Text('Register'),
                         onPressed: () => Navigator.of(context)
                             .pushReplacementNamed(RegistrationScreen.routeName),

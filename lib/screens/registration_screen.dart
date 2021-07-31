@@ -1,7 +1,9 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:fluttertoast/fluttertoast.dart';
+
+import 'login_screen.dart';
+import '../models/app_user.dart';
+import '../helpers/snackbar.dart';
 
 class RegistrationScreen extends StatefulWidget {
   static const routeName = './registration';
@@ -10,60 +12,38 @@ class RegistrationScreen extends StatefulWidget {
 }
 
 class RegistrationScreenState extends State<RegistrationScreen> {
-  Size _size;
-  String _radioVal = '';
+  late Size _size;
   final _nameCtrl = TextEditingController();
   final _phNoCtrl = TextEditingController();
   final _formkey = GlobalKey<FormState>();
 
-  void _onRadioPress(String val) {
-    setState(() {
-      _radioVal = val;
-    });
-  }
-
   void onSignupPress() async {
-    if (_formkey != null &&
-        _formkey.currentState.validate() &&
-        _radioVal != '') {
-      _formkey.currentState.save();
+    if (_formkey.currentState!.validate()) {
+      _formkey.currentState!.save();
       final _user = AppUser(
         id: DateTime.now().toString(),
         name: _nameCtrl.text,
         phoneNumber: '+91 ' + _phNoCtrl.text,
       );
-      Fluttertoast.showToast(msg: 'Please wait...');
-      LoadingDialog.loader(context);
+      showSnackBar(context, message: 'Please wait...');
       try {
-        final avl = (await FirebaseFirestore.instance
-                .collection('users')
-                .where('phNo', isEqualTo: '+91 ' + _phNoCtrl.text)
-                .get())
-            .docs
-            ?.isEmpty;
-        Navigator.pop(context);
+        final avl = true;
         if (avl) {
-          Authentication.signupWithPhoneNumber(context, user: _user);
-          Navigator.of(context).push(PageRouteBuilder(
-            pageBuilder: (context, _, __) => OtpVerifyPopup(user: _user),
-            opaque: false,
-          ));
+          // Navigator.of(context).push(PageRouteBuilder(
+          //   pageBuilder: (context, _, __) => OtpVerifyPopup(user: _user),
+          //   opaque: false,
+          // ));
+          showSnackBar(context, message: 'Sign-up successful...');
         } else
-          Fluttertoast.showToast(
-              msg: 'User already registered!\nPlease login...');
-      } on FirebaseException catch (error) {
-        Navigator.pop(context);
-        Fluttertoast.showToast(msg: error.message);
+          showSnackBar(context,
+              message: 'User already registered!\nPlease login...');
       } on PlatformException catch (error) {
-        Navigator.pop(context);
-        Fluttertoast.showToast(msg: error.message);
+        showSnackBar(context, message: error.message ?? "");
       } catch (_) {
-        Navigator.pop(context);
-        Fluttertoast.showToast(msg: 'Something went wrong!');
+        showSnackBar(context, message: 'Something went wrong!');
       }
-    }
-    else
-      Fluttertoast.showToast(msg: 'Please fill all the details');
+    } else
+      showSnackBar(context, message: 'Please fill all the details');
   }
 
   @override
@@ -73,21 +53,19 @@ class RegistrationScreenState extends State<RegistrationScreen> {
         body: Container(
             decoration: BoxDecoration(
                 gradient: LinearGradient(
-                    colors:  colors: <Color>[
-                        Color(0xffee0000),
-                        Color(0xffeeee00)
-                    ],
-                    )),
+              colors: <Color>[Color(0xffee0000), Color(0xffeeee00)],
+            )),
             child: ListView(
                 physics: BouncingScrollPhysics(),
                 padding: EdgeInsets.symmetric(vertical: _size.height * 0.05),
                 children: <Widget>[
-                  Align(
-                      alignment: Alignment.centerLeft,
-                      child: IconButton(
-                          icon: Icon(Icons.arrow_back),
-                          onPressed: () => Navigator.pop(context))),
-                  SizedBox(height: _size.height * 0.05),
+                  Navigator.canPop(context)
+                      ? Align(
+                          alignment: Alignment.centerLeft,
+                          child: IconButton(
+                              icon: Icon(Icons.arrow_back),
+                              onPressed: () => Navigator.pop(context)))
+                      : SizedBox(height: 30),
                   Padding(
                       padding: EdgeInsets.only(left: _size.width * 0.05),
                       child: RichText(
@@ -122,8 +100,10 @@ class RegistrationScreenState extends State<RegistrationScreen> {
                             TextFormField(
                               controller: _nameCtrl,
                               validator: (value) {
-                                if (value.isEmpty)
+                                if (value!.isEmpty)
                                   return 'This must be filled!';
+                                else if (value.length < 5)
+                                  return 'Username is too short!';
                                 return null;
                               },
                               decoration: InputDecoration(
@@ -134,23 +114,18 @@ class RegistrationScreenState extends State<RegistrationScreen> {
                             TextFormField(
                               controller: _phNoCtrl,
                               validator: (value) {
-                                if (value.isEmpty)
+                                if (value!.isEmpty)
                                   return 'This must be filled!';
+                                else if (value.length != 10)
+                                  return 'Phone number must contain 10 digits!';
                                 return null;
                               },
                               decoration: InputDecoration(
-                                labelText: "Phone Number",
-                              ),
+                                  labelText: "Phone Number",
+                                  prefixText: "+91 "),
                               keyboardType: TextInputType.phone,
                             ),
                             SizedBox(height: _size.height * 0.05),
-                            Align(
-                                alignment: Alignment.centerLeft,
-                                child: Text('Are you?',
-                                    style: TextStyle(
-                                        fontSize: 18,
-                                        fontWeight: FontWeight.w600,
-                                        color: Colors.blueGrey))),
                             Align(
                                 alignment: Alignment.centerRight,
                                 child: Padding(
@@ -170,8 +145,7 @@ class RegistrationScreenState extends State<RegistrationScreen> {
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       Text('An exesting member?'),
-                      FlatButton(
-                        textColor: Theme.of(context).accentColor,
+                      TextButton(
                         child: Text('Login'),
                         onPressed: () => Navigator.of(context)
                             .pushReplacementNamed(LogInScreen.routeName),

@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:classypay/widgets/contact_list.dart';
+
+import '../widgets/contact_list.dart';
 
 class HomeScreen extends StatelessWidget {
+  static const routeName = './home';
+
   const HomeScreen({Key? key}) : super(key: key);
 
   @override
