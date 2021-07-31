@@ -4,6 +4,7 @@ import 'package:flutter/services.dart';
 import 'login_screen.dart';
 import '../models/app_user.dart';
 import '../helpers/snackbar.dart';
+import '../widgets/otp_verify_popup.dart';
 
 class RegistrationScreen extends StatefulWidget {
   static const routeName = './registration';
@@ -29,10 +30,11 @@ class RegistrationScreenState extends State<RegistrationScreen> {
       try {
         final avl = true;
         if (avl) {
-          // Navigator.of(context).push(PageRouteBuilder(
-          //   pageBuilder: (context, _, __) => OtpVerifyPopup(user: _user),
-          //   opaque: false,
-          // ));
+          Navigator.of(context).push(PageRouteBuilder(
+            pageBuilder: (context, _, __) => OtpVerifyPopup(
+                user: _user, phoneNumber: "+91" + _phNoCtrl.text),
+            opaque: false,
+          ));
           showSnackBar(context, message: 'Sign-up successful...');
         } else
           showSnackBar(context,

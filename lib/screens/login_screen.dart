@@ -2,6 +2,7 @@ import "package:flutter/material.dart";
 import 'package:flutter/services.dart';
 
 import '../screens/registration_screen.dart';
+import '../widgets/otp_verify_popup.dart';
 import '../helpers/snackbar.dart';
 
 class LogInScreen extends StatefulWidget {
@@ -20,10 +21,11 @@ class LogInScreenState extends State<LogInScreen> {
     if (_formKey.currentState!.validate()) {
       _formKey.currentState!.save();
       showSnackBar(context, message: 'Please wait...');
-      // Navigator.of(context).push(PageRouteBuilder(
-      //   pageBuilder: (context, _, __) => OtpVerifyPopup(isLogin: true),
-      //   opaque: false,
-      // ));
+      Navigator.of(context).push(PageRouteBuilder(
+        pageBuilder: (context, _, __) =>
+            OtpVerifyPopup(isLogin: true, phoneNumber: "+91" + _phNoCtrl.text),
+        opaque: false,
+      ));
       showSnackBar(context, message: "Login successful...");
     }
   }
