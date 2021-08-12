@@ -9,7 +9,7 @@ class AppUser {
     required this.phoneNumber,
   });
 
-  static AppUser fromMap(Map<String, dynamic> doc) =>
+  factory AppUser.fromJson(Map<String, dynamic> doc) =>
       AppUser(id: doc['id'], name: doc['name'], phoneNumber: doc['phNo']);
 
   Map<String, dynamic> toJson() =>
